@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>adDSong</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body class="text-center">
+  <div class="container d-flex flex-column justify-content-around" style="height: 100vh;">
+    <div class="d-block">
+      <h1>Add DS Song</h1>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon3">www.youtube.com/watch?v=</span>
+        </div>
+        <input type="text" id="yt" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="wZZ7oFKsKzY">
+      </div>
+    </div>
+    <div>
+      <h2>Queue</h2>
+      <pre id="list"></pre>
+    </div>
+  </div>
+<script>
+  var pattern = /^.*?v=([a-z0-9_-]{11}).*?$/i;
+  var inp = document.getElementById('yt');
+  var list = document.getElementById('list');
+
+  inp.addEventListener('change', function(event) {
+    var input = event.target.value;
+    var match = input.match(pattern)[1];
+    if (match) {
+      inp.value = match;
+    }
+  });
+
+  inp.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      try {
+        fetch('/?yt=' + event.target.value)
+          .then((res) => {
+            if (res.status !== 200) {
+              throw new Error('Bad response');
+            }
+          });
+      } catch (error) {
+        alert('something went wrong');
+        console.log(error)
+      } finally {
+        setTimeout(updateList, 1000);
+      }
+    }
+  });
+
+  updateList = function() {
+    fetch('/list')
+      .then(res => res.text())
+      .then(text => {
+        list.innerText = text;
+      });
+  }
+  updateList();
+</script>
+</body>
+</html>
